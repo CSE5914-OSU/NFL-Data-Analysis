@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def season(df_data):
+def season(df_data: pd.DataFrame):
 	"""
 		Very simple season data aggregator. It adds up all the data and gives season totals.
 		@param df_data 
