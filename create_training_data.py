@@ -37,7 +37,7 @@ def generate_features(df_seasons: pd.DataFrame, df_last_season: pd.DataFrame,
 
 	columns_3_prev_seasons = [[col+"_season-"+str(i) for col in columns ]for i in range(1, 4)]
 	columns_10_prev_games = [[col+"_game-"+str(i) for col in columns ]for i in range(1, 11)]
-	columns_all = []
+	columns_all = ["player_name", "player_id", "season", "week"]
 	for cols in columns_3_prev_seasons:
 		for col in cols:
 			columns_all.append(col)
@@ -45,18 +45,35 @@ def generate_features(df_seasons: pd.DataFrame, df_last_season: pd.DataFrame,
 	for cols in columns_10_prev_games:
 		for col in cols:
 			columns_all.append(col)
+
+	print(columns_all)
     
 	features = pd.DataFrame(columns = columns_all)
-	print(features)
 
 	for index, row in df_this_season.iterrows():
 		player_id = row["player_id"]
 		if player_id not in used_ids:
 			player_name = row["player_name"]
 			used_ids.append(player_id)
+			temp_seasons = []
+			for i in range(1, 4):
+				temp_seasons.append(df_seasons[
+					df_seasons.player_id.isin([player_id]) & 
+					(df_seasons.season==(year-i))][columns].to_numpy())
+
+			last_season_games = (df_last_season[
+				df_last_season.player_id.isin([player_id])][columns])
+
+			this_season_games = (df_this_season[
+				df_this_season.player_id.isin([player_id])][columns])
+
+			# print(last_season_games)
+
+				
+				
+					
 
 
-		
 
 
 if __name__ == "__main__":
