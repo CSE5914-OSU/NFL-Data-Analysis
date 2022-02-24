@@ -29,10 +29,10 @@ def season(df_data: pd.DataFrame):
 			player_name = row["player_name"]
 			seas = row["season"]
 			used_ids.append(player_id)
-			for i in range(1, 4):
-				df_temp = df_data[
-					df_data.player_id.isin([player_id]) & 
-					(df_data.season==(year-i))]
+			df_temp = df_data[
+				df_data.player_id.isin([player_id]) & 
+				(df_data.season_type=="REG")]
+			summed = df_temp[sum_columns].sum()
 			
 			
 			df_player = pd.DataFrame(
