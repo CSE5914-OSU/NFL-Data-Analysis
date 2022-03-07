@@ -38,7 +38,6 @@ def create_df_week(
 			A dataframe that has nfl scheduling data
 
 		@returns a dataframe with each teams data for the week
-
 	"""
 	teams = []
 	df_week = pd.DataFrame(columns=["team", "season", "week", "opponent", "home", *sum_columns])
@@ -100,7 +99,7 @@ def main():
 
 
 
-	df_all_season_data = pd.DataFrame(
+	df_all_seasons_data = pd.DataFrame(
 		columns=["team", "season", "week", "opponent", "home", *sum_columns]
 	)
 
@@ -110,13 +109,13 @@ def main():
 		for week in range(1,18):
 			print("\tWeek =", week)
 			df_data = pd.read_csv("Game-By-Game/player_stats_"+str(year)+".csv")
-			df_all_season_data = pd.concat(
-				[df_all_season_data, 
+			df_all_seasons_data = pd.concat(
+				[df_all_seasons_data, 
 					create_df_week(df_data, week, year, sum_columns, df_schedule)
 				]
 			)
 
-	df_all_season_data.to_csv("Season/all_teams_seasons_data.csv")
+	df_all_seasons_data.to_csv("Season/all_teams_seasons_data.csv")
 
 
 if __name__ == "__main__":
