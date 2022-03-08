@@ -25,5 +25,54 @@ df_team_weekly_data = pd.read_csv('Season/weekly_team_defense_running_averages.c
 
 df_team_weekly_data = df_team_weekly_data[(df_team_weekly_data.season >= 2004)]
 
-print(df_player_weekly_data)
-print(df_team_weekly_data)
+df_player_percent_of_opponent_average = pd.DataFrame(columns=[
+    [*player_header_columns, *data_columns]
+])
+
+week = 1
+year = 1998
+for index, row in df_player_weekly_data.iterrows():
+    if year != row['season']:
+        year = row['season']
+        print(year)
+    player_team = row['recent_team']
+    player_opponent = df_team_weekly_data[
+        (df_team_weekly_data.team == player_team) &
+        (df_team_weekly_data.season == row['season']) &
+        (df_team_weekly_data.week == row['week'])
+    ]['opponent'].to_numpy()
+
+    if len(player_opponent) == 0:
+        continue
+    else:
+        player_opponent = player_opponent[0]
+
+    player_opponent_data = df_team_weekly_data[
+        (df_team_weekly_data.team == player_opponent) &
+        (df_team_weekly_data.season == row['season']) &
+        (df_team_weekly_data.week == row['week'])
+    ][data_columns].to_numpy()
+
+    if len(player_opponent_data)!=0:
+        player_opponent_data = player_opponent_data[0]
+
+    player_data = row[data_columns].to_numpy()
+
+
+    if len(player_opponent_data)==0 or len(player_data)==0:
+        continue
+
+    for i, x in enumerate(player_opponent_data):
+        if x==0:
+            if player_data[i] != 0:
+                player_opponent_data[i] = player_data[i]
+            else:
+                player_opponent_data[i] = 1
+
+    player_percentages_data = player_data/player_opponent_data
+
+
+
+    print(player_percentages_data)
+
+    
