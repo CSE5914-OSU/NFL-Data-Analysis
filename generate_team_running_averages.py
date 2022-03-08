@@ -1,10 +1,26 @@
 import pandas as pd
+import numpy as np
 
-def weight(year_ago: int, week_ago: int):
-    if year_ago > 0:
-        return 2**(-year_ago)
+def weight(years_ago: int, weeks_ago: int):
+    if years_ago > 0:
+        return 2**(-years_ago)
     else:
         return 1.5**(-weeks_ago/17)
+
+def weighted_sum(arr):
+    if len(arr)>0:
+        arr_without_lead = arr[:, 2:]
+        my_arr = np.array([0.0]*len(arr_without_lead[0]))
+        ws = []
+        for i, d in enumerate(arr):
+            week_ago = arr[i][1]
+            year_ago = arr[0][0]-arr[i][0]+3
+            ws.append(weight(year_ago, week_ago))
+            my_arr += ws[i]*arr_without_lead[i]
+
+        return my_arr/sum(ws)
+    else:
+        return np.array([])
 
 def create_df_week(
     df_weekly_team_data: pd.DataFrame, 
@@ -23,9 +39,34 @@ def create_df_week(
         if len(teams)==32:
             break
 
-    print(teams)
 
+    for team in teams:
+        team_week_temp = (df_weekly_team_data[
+            (df_weekly_team_data.team == team) &
+            (df_weekly_team_data.season >= year-3) &
+            (df_weekly_team_data.season < year) |
+            (
+                (df_weekly_team_data.season == year) & 
+                (df_weekly_team_data.week < week) &
+                (df_weekly_team_data.team == team)
+            )
+        ])[["season", "week", *sum_columns]].to_numpy()
 
+        np_weighted_sum = weighted_sum(team_week_temp)
+
+        if len(np_weighted_sum) > 0:
+
+            team_week_temp = (df_weekly_team_data[
+                (df_weekly_team_data.team == team) &
+                (df_weekly_team_data.season == year) &
+                (df_weekly_team_data.week == week)
+            ])[header_columns].to_numpy()
+
+            if len(team_week_temp)>0:
+                df_data = pd.DataFrame([[*team_week_temp[0], *np_weighted_sum]], columns=[*header_columns, *sum_columns])
+                df_week = pd.concat([df_week, df_data])
+
+    return df_week
 
 def main():
     df_weekly_team_data = pd.read_csv("Season/all_teams_seasons_data.csv")
@@ -47,14 +88,18 @@ def main():
         columns=[*header_columns, *avg_columns]
     )
 
-    for year in range(2002, 2021):
+    for year in range(1999, 2022):
+        print('year =', year)
         for week in range(1, 18):
+            print('\tweek =', week)
             df_all_seasons_data = pd.concat(
                 [
                     df_all_seasons_data, 
                     create_df_week(df_weekly_team_data, week, year, avg_columns, header_columns)
                 ]
             )
+            
+
 
     df_all_seasons_data.to_csv("Season/weekly_team_running_averages.csv")
 
