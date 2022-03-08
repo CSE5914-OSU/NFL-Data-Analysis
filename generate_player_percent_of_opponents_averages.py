@@ -17,17 +17,17 @@ df_player_weekly_data = pd.read_csv('Season/all_weeks_player_data.csv')[
     [*player_header_columns, *data_columns]
 ]
 
-df_player_weekly_data = df_player_weekly_data[(df_player_weekly_data.season >= 2004)]
+df_player_weekly_data = df_player_weekly_data[(df_player_weekly_data.season >= 2003)]
 
 df_team_weekly_data = pd.read_csv('Season/weekly_team_defense_running_averages.csv')[
     [*team_header_columns, *data_columns]
 ]
 
-df_team_weekly_data = df_team_weekly_data[(df_team_weekly_data.season >= 2004)]
+df_team_weekly_data = df_team_weekly_data[(df_team_weekly_data.season >= 2003)]
 
-df_player_percent_of_opponent_average = pd.DataFrame(columns=[
-    [*player_header_columns, *data_columns]
-])
+df_player_percent_of_opponent_average = pd.DataFrame(
+    columns=[*player_header_columns, *data_columns]
+)
 
 week = 1
 year = 1998
@@ -71,8 +71,19 @@ for index, row in df_player_weekly_data.iterrows():
 
     player_percentages_data = player_data/player_opponent_data
 
+    combo_numpy = [
+        *row[player_header_columns].to_numpy(),
+        *player_percentages_data
+    ]
 
+    df_player_percentages_data = pd.DataFrame(
+        [combo_numpy],
+        columns = [*player_header_columns, *data_columns]
+    )
 
-    print(player_percentages_data)
+    df_player_percent_of_opponent_average = pd.concat(
+        [df_player_percent_of_opponent_average, df_player_percentages_data]
+    )
 
+df_player_percent_of_opponent_average.to_csv('Season/percent_of_opponent_running_averages.csv')
     
