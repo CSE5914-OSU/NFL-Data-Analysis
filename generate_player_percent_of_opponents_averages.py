@@ -63,11 +63,15 @@ for index, row in df_player_weekly_data.iterrows():
         continue
 
     for i, x in enumerate(player_opponent_data):
-        if x==0:
+        if x==0 or pd.isna(x):
             if player_data[i] != 0:
                 player_opponent_data[i] = player_data[i]
             else:
                 player_opponent_data[i] = 1
+
+    for i, x in enumerate(player_data):
+        if pd.isna(x):
+            player_data[i]=0
 
     player_percentages_data = player_data/player_opponent_data
 

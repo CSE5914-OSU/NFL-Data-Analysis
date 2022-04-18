@@ -32,7 +32,7 @@ def create_df_week(
     teams = []
     df_week = pd.DataFrame(columns=[*header_columns, *sum_columns])
     for index, row in df_weekly_team_data.iterrows():
-        team = row["opponent"]
+        team = row["team"]
         if team not in teams:
             teams.append(team)
 
@@ -54,6 +54,7 @@ def create_df_week(
 
         np_weighted_sum = weighted_sum(team_week_temp)
 
+
         if len(np_weighted_sum) > 0:
 
             team_week_temp = (df_weekly_team_data[
@@ -65,6 +66,8 @@ def create_df_week(
             if len(team_week_temp)>0:
                 df_data = pd.DataFrame([[*team_week_temp[0], *np_weighted_sum]], columns=[*header_columns, *sum_columns])
                 df_week = pd.concat([df_week, df_data])
+
+        
 
     return df_week
 
@@ -102,7 +105,7 @@ def main():
 
 
     df_all_seasons_data.to_csv("Season/weekly_team_defense_running_averages.csv")
-    print(df_all_seasons_data)
+    
 
 
 

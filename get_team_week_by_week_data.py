@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pyreadr
 
 def played(array):
 	"""
@@ -40,6 +39,7 @@ def create_df_week(
 		@returns a dataframe with each teams data for the week
 	"""
 	teams = []
+	teams2 = []
 	df_week = pd.DataFrame(columns=["team", "season", "week", "opponent", "home", *sum_columns])
 	for index, row in df_data.iterrows():
 		team = row["recent_team"]
@@ -50,7 +50,9 @@ def create_df_week(
 		if len_teams==32 or (len_teams==31 and year<2002):
 			break
 
+
 	for team in teams:
+
 		df_temp = df_data[
 			df_data.recent_team.isin([team]) & 
 			(df_data.season_type=="REG") &
@@ -63,9 +65,11 @@ def create_df_week(
 			(df_schedule.home_team.isin([team]) | df_schedule.away_team.isin([team])) &
 			(df_schedule.season==year) & (df_schedule.week==week)
 		]
+
 		if len(df_game.to_numpy())==0:
 			continue
 
+		
 		home = df_game["home_team"].to_numpy()[0]
 		away = df_game["away_team"].to_numpy()[0]
 		if team == home:
@@ -80,6 +84,8 @@ def create_df_week(
 				[[team, year, week, opponent, home, *summed.array]], 
 				columns=["team", "season", "week", "opponent", "home", *sum_columns])
 			])
+
+		
 
 	return df_week
 
@@ -104,7 +110,7 @@ def main():
 	)
 
 	for year in range(1999,2022):
-		df_schedule = pyreadr.read_r('Schedules/sched_'+str(year)+'.rds')[None]
+		df_schedule = pd.read_csv('Schedules/sched_'+str(year)+'.csv')
 		print("Year =", year)
 		for week in range(1,18):
 			print("\tWeek =", week)
